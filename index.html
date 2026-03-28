@@ -170,6 +170,19 @@
 
     .spinner { width: 24px; height: 24px; border: 2px solid rgba(255,255,255,.1); border-top-color: #00e676; border-radius: 50%; animation: spin .8s linear infinite; margin: 12px auto; display: block; }
 
+    /* Notification button */
+    .notif-btn {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 20px; padding: 6px 14px; cursor: pointer;
+      font-family: 'Outfit',sans-serif; font-size: 12px; font-weight: 600;
+      color: rgba(255,255,255,.4); transition: all .2s; white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .notif-btn:hover { border-color: rgba(255,255,255,.2); color: rgba(255,255,255,.7); }
+    .notif-btn.active { background: rgba(0,230,118,.12); border-color: rgba(0,230,118,.3); color: #00e676; }
+    .notif-btn.denied { background: rgba(255,82,82,.08); border-color: rgba(255,82,82,.2); color: #ff5252; }
+
     @keyframes fadeIn    { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
     @keyframes spin      { to { transform: rotate(360deg); } }
     @keyframes pulse-dot { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.4; transform:scale(.7); } }
@@ -195,8 +208,14 @@
     <div class="badge">🏸 Badminton · Jeudi soir</div>
     <h1>INSCRIPTOR<br><span>JEUDI SOIR</span></h1>
     <p class="subtitle">Planning des 4 prochains jeudis</p>
-    <div class="live-badge" id="live-badge">
-      <span class="live-dot"></span><span id="live-text">LIVE · Mise à jour auto</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;">
+      <div class="live-badge" id="live-badge" style="margin-bottom:0;">
+        <span class="live-dot"></span><span id="live-text">LIVE · Mise à jour auto</span>
+      </div>
+      <button class="notif-btn" id="notif-btn" onclick="toggleNotifications()">
+        <span id="notif-icon">🔔</span>
+        <span id="notif-label">Notifications</span>
+      </button>
     </div>
 
     <!-- Choix du nombre de terrains -->
@@ -287,7 +306,7 @@
   </div>
 
   <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzAN85HlVDl1P7MBWIXVdoaEHKP4HU3cxIM8NFO61ijiiDPyyWtvmfMSCGVrE7p_utJUQ/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwDgwGnG5sVCHokeKHSMN9rWh0c_lpC5LkxdOoCcxCbhKWaQO6Vbtray31-TRBOw7n0ZA/exec";
     const WAITLIST_MAX = 2;
     const DAYS_OPEN    = 28;
     const TERRAINS_MAX = { 2: 8, 3: 12, 4: 16 };
@@ -406,7 +425,10 @@
       document.getElementById("player-list").innerHTML = '<div class="spinner"></div>';
       try {
         const data = await api("list", { week: key });
-        weekData[key] = { players: data.players || [], waitlist: data.waitlist || [] };
+        weekData[key] = {
+          players:  (data.players  || []).map(safePlayer),
+          waitlist: (data.waitlist || []).map(safePlayer)
+        };
         renderTabs(); renderPlayers(weekData[key]);
       } catch(e) {
         document.getElementById("player-list").innerHTML = '<p style="color:#ff5252;font-size:13px">Erreur de connexion.</p>';
@@ -418,7 +440,10 @@
         const key = dateKey(d);
         try {
           const data = await api("list", { week: key });
-          weekData[key] = { players: data.players || [], waitlist: data.waitlist || [] };
+          weekData[key] = {
+            players:  (data.players  || []).map(safePlayer),
+            waitlist: (data.waitlist || []).map(safePlayer)
+          };
         } catch(e) { weekData[key] = { players:[], waitlist:[] }; }
       }));
       renderTabs();
@@ -511,7 +536,10 @@
       try {
         const data = await api("add", { week: key, name, email, max });
         if (data.success) {
-          weekData[key] = { players: data.players || [], waitlist: data.waitlist || [] };
+          weekData[key] = {
+            players:  (data.players  || []).map(safePlayer),
+            waitlist: (data.waitlist || []).map(safePlayer)
+          };
           renderPlayers(weekData[key]); renderTabs();
           document.getElementById("name-input").value = "";
           document.getElementById("email-input").value = "";
@@ -530,7 +558,10 @@
       try {
         const data = await api("remove", { week: key, name });
         if (data.success) {
-          weekData[key] = { players: data.players || [], waitlist: data.waitlist || [] };
+          weekData[key] = {
+            players:  (data.players  || []).map(safePlayer),
+            waitlist: (data.waitlist || []).map(safePlayer)
+          };
           renderPlayers(weekData[key]); renderTabs();
           if (data.promoted) { showMsg("✓ " + data.promoted + " a été promu·e de la liste d'attente !", "success"); setTimeout(clearMsg, 4000); }
         }
@@ -587,7 +618,17 @@
       el.className = type === "error" ? "msg-error" : type === "waitlist" ? "msg-waitlist" : "msg-success";
     }
     function clearMsg() { const el = document.getElementById("form-msg"); el.textContent = ""; el.className = ""; }
-    function escHtml(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+    function escHtml(s) { return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+    // Normalise un joueur — gère le cas où l'API retourne une string brute au lieu de {name, email}
+    function safePlayer(p) {
+      if (!p) return { name: "", email: "" };
+      if (typeof p === "string") {
+        const m = p.match(/^(.*?)<([^>]+)>$/);
+        if (m) return { name: m[1].trim(), email: m[2].trim() };
+        return { name: p.trim(), email: "" };
+      }
+      return { name: p.name || "", email: p.email || "" };
+    }
     function escAttr(s) { return String(s).replace(/'/g,"\\'"); }
 
     document.getElementById("name-input").addEventListener("keydown", e => { if (e.key === "Enter") register(); });
@@ -597,18 +638,124 @@
     const savedName = localStorage.getItem("inscriptor-chat-name");
     if (savedName) document.getElementById("chat-name").value = savedName;
 
-    // ── Service Worker (PWA) ──────────────────────────────────────────
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("sw.js").catch(() => {});
+    // ── Service Worker + Notifications (PWA) ────────────────────────
+    let swReg = null;
+
+    async function initSW() {
+      if (!("serviceWorker" in navigator)) return;
+      try {
+        swReg = await navigator.serviceWorker.register("sw.js");
+        console.log("SW registered");
+      } catch(e) { console.log("SW error", e); }
     }
+
+    async function requestNotifPermission() {
+      if (!("Notification" in window)) return false;
+      if (Notification.permission === "granted") return true;
+      if (Notification.permission === "denied") return false;
+      const perm = await Notification.requestPermission();
+      return perm === "granted";
+    }
+
+    function sendSnapshotToSW(snapshot) {
+      if (!navigator.serviceWorker.controller) return;
+      navigator.serviceWorker.controller.postMessage({ type: "SAVE_SNAPSHOT", snapshot });
+      navigator.serviceWorker.controller.postMessage({ type: "START_CHECK" });
+    }
+
+    async function initNotifications() {
+      await initSW();
+      // Attendre que le SW soit actif
+      if (swReg && swReg.installing) {
+        await new Promise(r => {
+          const sw = swReg.installing;
+          sw.addEventListener("statechange", () => { if (sw.state === "activated") r(); });
+        });
+      }
+    }
+
+    initSW();
 
     // ── Init ──────────────────────────────────────────────────────────
     thursdays = getNextThursdays(4);
     setTerrains(nbTerrains); // applique le choix sauvegardé
     renderTabs();
     loadPlayers();
-    prefetchAll();
+    prefetchAll().then(() => {
+      // Envoyer snapshot initial au SW après chargement
+      setTimeout(() => sendSnapshotToSW(buildSnapshot()), 2000);
+    });
     loadChat();
+    updateNotifButton();
+
+    // ── Notifications helpers ─────────────────────────────────────────
+    function buildSnapshot() {
+      const snap = {};
+      thursdays.forEach(d => {
+        const key = dateKey(d);
+        if (weekData[key]) {
+          snap[key] = {
+            players:  (weekData[key].players  || []).map(p => p.name),
+            waitlist: (weekData[key].waitlist || []).map(p => p.name)
+          };
+        }
+      });
+      return snap;
+    }
+
+    function updateNotifButton() {
+      const btn = document.getElementById("notif-btn");
+      const icon = document.getElementById("notif-icon");
+      const label = document.getElementById("notif-label");
+      if (!("Notification" in window)) {
+        btn.style.display = "none"; return;
+      }
+      if (Notification.permission === "granted") {
+        btn.className = "notif-btn active";
+        icon.textContent = "🔔"; label.textContent = "Notifs actives";
+      } else if (Notification.permission === "denied") {
+        btn.className = "notif-btn denied";
+        icon.textContent = "🔕"; label.textContent = "Notifs bloquées";
+      } else {
+        btn.className = "notif-btn";
+        icon.textContent = "🔔"; label.textContent = "Notifications";
+      }
+    }
+
+    async function toggleNotifications() {
+      if (!("Notification" in window)) {
+        alert("Les notifications ne sont pas supportées sur ce navigateur.\nSur iPhone : installe d\'abord l\'app depuis Safari (bouton partage → Sur l\'écran d\'accueil).");
+        return;
+      }
+      if (Notification.permission === "denied") {
+        alert("Les notifications sont bloquées.\niPhone : Réglages → Safari → Notifications\nAndroid : Paramètres → Applis → Inscriptor → Notifications");
+        return;
+      }
+      if (Notification.permission === "granted") {
+        // Tester en envoyant une notif de démo
+        if (swReg) {
+          await swReg.showNotification("🏸 Inscriptor", {
+            body: "Les notifications sont actives ! Tu seras averti·e des inscriptions.",
+            icon: "/inscriptor/icon-192.png",
+            tag:  "inscriptor-test"
+          });
+        }
+        return;
+      }
+      // Demander la permission
+      const granted = await requestNotifPermission();
+      if (granted) {
+        sendSnapshotToSW(buildSnapshot());
+        if (swReg) {
+          await swReg.showNotification("🏸 Inscriptor", {
+            body: "Super ! Tu recevras une notification à chaque inscription ou désistement.",
+            icon: "/inscriptor/icon-192.png",
+            tag:  "inscriptor-welcome"
+          });
+        }
+      }
+      updateNotifButton();
+    }
 
     // ── Auto-refresh 15s ──────────────────────────────────────────────
     setInterval(async () => {
@@ -619,7 +766,10 @@
         const key = dateKey(d);
         try {
           const data = await api("list", { week: key });
-          weekData[key] = { players: data.players || [], waitlist: data.waitlist || [] };
+          weekData[key] = {
+            players:  (data.players  || []).map(safePlayer),
+            waitlist: (data.waitlist || []).map(safePlayer)
+          };
         } catch(e) {}
       }));
       try {
@@ -630,6 +780,8 @@
       renderPlayers(weekData[dateKey(thursdays[selectedIdx])] || { players:[], waitlist:[] });
       badge.classList.remove("syncing");
       document.getElementById("live-text").textContent = "LIVE · Mise à jour auto";
+      // Mettre à jour le snapshot pour les notifications
+      sendSnapshotToSW(buildSnapshot());
     }, 15000);
   </script>
 </body>
