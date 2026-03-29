@@ -359,11 +359,17 @@
 
     // ── Dates ─────────────────────────────────────────────────────────
     function getNextThursdays(n) {
-      const now = new Date(); const day = now.getDay();
-      const diff = day <= 4 ? 4 - day : 4 - day + 7;
+      // Utiliser la date locale (pas UTC) pour éviter les décalages de fuseau horaire
+      const now    = new Date();
+      const local  = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // minuit local
+      const day    = local.getDay(); // 0=dim, 1=lun, ..., 4=jeu, 5=ven, 6=sam
+      // Si on est vendredi/samedi/dimanche → attendre le jeudi suivant
+      // Sinon (lun→jeu) → prendre le jeudi de cette semaine (ou aujourd'hui si jeudi)
+      const diff   = day <= 4 ? 4 - day : 11 - day;
       return Array.from({length: n}, (_, i) => {
-        const d = new Date(now); d.setHours(0,0,0,0);
-        d.setDate(now.getDate() + diff + i * 7); return d;
+        const d = new Date(local);
+        d.setDate(local.getDate() + diff + i * 7);
+        return d;
       });
     }
     function dateKey(d) { return "badminton-" + d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate(); }
