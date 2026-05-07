@@ -233,7 +233,7 @@
     <!-- Header -->
     <div id="header-section" class="fade">
       <div class="sport-badge bad" id="sport-badge">🏸 Badminton · Jeudi soir</div>
-      <h1>BAD-<br><span class="accent-bad" id="title-accent">INSCRIPTOR</span></h1>
+      <h1><span id="title-prefix">BAD-</span><br><span class="accent-bad" id="title-accent">INSCRIPTOR</span></h1>
       <p class="subtitle" id="subtitle-text">Planning des 4 prochains jeudis</p>
       <a href="https://www.lefive.fr/nos-centres/71/ol" target="_blank" class="venue-link" id="venue-link" style="display:none">📍 Five OL — Voir le centre ↗</a>
     </div>
@@ -386,10 +386,20 @@
     function updateNotifButton() {
       const btn = document.getElementById("notif-btn");
       if (!("Notification" in window)) { btn.style.display="none"; return; }
-      const sp = currentSport;
-      if (Notification.permission==="granted") { btn.className="notif-btn active-"+sp; document.getElementById("notif-icon").textContent="🔔"; document.getElementById("notif-label").textContent="Notifs actives"; }
-      else if (Notification.permission==="denied") { btn.className="notif-btn denied"; document.getElementById("notif-icon").textContent="🔕"; document.getElementById("notif-label").textContent="Notifs bloquées"; }
-      else { btn.className="notif-btn"; document.getElementById("notif-icon").textContent="🔔"; document.getElementById("notif-label").textContent="Notifications"; }
+      // Reset classes first
+      btn.className = "notif-btn";
+      if (Notification.permission==="granted") {
+        btn.classList.add("active-"+currentSport);
+        document.getElementById("notif-icon").textContent="🔔";
+        document.getElementById("notif-label").textContent="Notifs actives";
+      } else if (Notification.permission==="denied") {
+        btn.classList.add("denied");
+        document.getElementById("notif-icon").textContent="🔕";
+        document.getElementById("notif-label").textContent="Notifs bloquées";
+      } else {
+        document.getElementById("notif-icon").textContent="🔔";
+        document.getElementById("notif-label").textContent="Notifications";
+      }
     }
     async function toggleNotifications() {
       if (!("Notification" in window)) { alert("Sur iPhone : installe d'abord l'app depuis Safari."); return; }
@@ -454,6 +464,7 @@
       setTimeout(()=>{
         document.getElementById("sport-badge").className = "sport-badge "+sport;
         document.getElementById("sport-badge").textContent = cfg.label;
+        document.getElementById("title-prefix").textContent = sport==="bad" ? "BAD-" : "FIVE-";
         document.getElementById("title-accent").className = "accent-"+sport;
         document.getElementById("title-accent").textContent = cfg.titleLine;
         document.getElementById("subtitle-text").textContent = cfg.subtitle;
