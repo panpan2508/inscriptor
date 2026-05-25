@@ -887,7 +887,7 @@
       const listEl=document.getElementById("player-list");
       if (!players.length&&!waitlist.length){listEl.innerHTML='<p class="empty">Aucun inscrit pour l\'instant. Sois le premier ! '+(sport==="bad"?"🏸":"⚽")+'</p>';return;}
       const displayPlayers = isAprilFool() ? applyAprilFool(players) : players;
-      let html=displayPlayers.map((p,i)=>'<div class="player-item"><div class="player-left">'+makeAvatar(p.name)+'<span class="player-name">'+escHtml(p.name)+(p.email?'<span class="player-email-icon">📧</span>':"")+'</span></div><button class="btn-remove" onclick="removePlayer(\\''+escAttr(players[i].name)+'\\')">Retirer</button></div>').join("");
+      let html=displayPlayers.map(function(p,i){ var rn=players[i].name; return '<div class="player-item"><div class="player-left">'+makeAvatar(p.name)+'<span class="player-name">'+escHtml(p.name)+(p.email?'<span class="player-email-icon">&#128231;</span>':'')+'</span></div><button class="btn-remove" onclick="removePlayer(&quot;'+escAttr(rn)+'&quot;)">Retirer</button></div>'; }).join("");
       if (waitlist.length){
         html+='<div class="waitlist-separator"><div class="waitlist-separator-line"></div><div class="waitlist-separator-text">⏳ Liste d\'attente</div><div class="waitlist-separator-line"></div></div>';
         html+=waitlist.map((p,i)=>'<div class="player-item waitlist-item"><div class="player-left"><span class="player-num">#'+(i+1)+'</span><span class="player-name">'+escHtml(p.name)+(p.email?'<span class="player-email-icon">📧</span>':"")+'</span></div><div style="display:flex;align-items:center;gap:6px"><span class="waitlist-badge">Attente '+(i+1)+'/'+cfg.waitlistMax+'</span><button class="btn-remove" onclick="removePlayer(\''+escAttr(p.name)+'\')">Retirer</button></div></div>').join("");
@@ -919,18 +919,10 @@
           } else {
             showMsg("✓ "+name+" est inscrit·e !","success");
             launchConfetti(2000);
-            const newCount=(data.players||[]).length, newMax=SPORTS[currentSport].maxFn();
-            if (newCount>=newMax) { setTimeout(()=>{ showOverlay(currentSport==="bad"?"🏸":"⚽","COMPLET !","La soirée est complète — liste d'attente ouverte !"); },800); }
+            const newCountReg=(data.players||[]).length, newMax=SPORTS[currentSport].maxFn();
+            if (newCountReg>=newMax) { setTimeout(()=>{ showOverlay(currentSport==="bad"?"🏸":"⚽","COMPLET !","La soirée est complète — liste d'attente ouverte !"); },800); }
             launchConfetti(2000);
-            // Si la liste vient d'être complète
-            const newCount = (data.players||[]).length;
-            const newMax   = SPORTS[currentSport].maxFn();
-            if (newCount >= newMax) {
-              setTimeout(()=>{
-                const emoji = currentSport==="bad" ? "🏸" : "⚽";
-                showOverlay(emoji, "COMPLET !", "La soirée est complète — liste d'attente ouverte !");
-              }, 800);
-            }
+
           }
           setTimeout(clearMsg,4000);
           // Mettre à jour le classement si ouvert
@@ -1211,6 +1203,101 @@
         const data=await api("saveCompo",{week:key,teamA:JSON.stringify(tA),teamB:JSON.stringify(tB)});
         if(data.success){const msg=document.getElementById("compo-save-msg");msg.style.display="block";msg.textContent="✓ Compos sauvegardées !";setTimeout(function(){msg.style.display="none";},3000);}
       }catch(e){alert("Erreur.");}
+    }
+
+
+    // ── Abonnés rappel Bad ────────────────────────────────────────────────────────
+    async function subscribe() {
+      const name=document.getElementById("sub-name").value.trim();
+      const email=document.getElementById("sub-email").value.trim();
+      const msg=document.getElementById("sub-msg");
+      if(!name||!email){msg.textContent="Remplis les deux champs.";msg.style.color="#ff5252";return;}
+      try{
+        const data=await api("subscribe",{name,email});
+        if(data.success){
+          msg.textContent="✓ Abonné·e ! Tu recevras un rappel chaque lundi.";msg.style.color="#00e676";
+          document.getElementById("sub-name").value="";document.getElementById("sub-email").value="";
+          loadSubscribers();
+        }else{msg.textContent=data.error||"Erreur.";msg.style.color="#ff5252";}
+      }catch(e){msg.textContent="Erreur de connexion.";msg.style.color="#ff5252";}
+    }
+
+    async function unsubscribe(email) {
+      if(!confirm("Se désabonner des rappels pour "+email+" ?"))return;
+      try{const data=await api("unsubscribe",{email});if(data.success)loadSubscribers();}catch(e){}
+    }
+
+    async function loadSubscribers() {
+      try{
+        const data=await api("getSubscribers",{});
+        const subs=data.subscribers||[];
+        document.getElementById("sub-count").textContent=subs.length;
+        const listEl=document.getElementById("sub-list-items");
+        if(!subs.length){
+          listEl.innerHTML='<div style="font-size:12px;color:rgba(255,255,255,.25);font-style:italic;">Aucun abonné pour l’instant.</div>';
+        }else{
+          listEl.innerHTML=subs.map(function(s){
+            return '<div class="subscriber-row"><span>'+escHtml(s.name)+' <span style="color:rgba(255,255,255,.3);font-size:11px;">'+escHtml(s.email)+'</span></span><button class="btn-unsub" onclick="unsubscribe(&quot;'+escAttr(s.email)+'&quot;)">&#x2715;</button></div>';
+          }).join("");
+          document.getElementById("sub-list").style.display="block";
+        }
+        if(subs.length>0)document.getElementById("sub-list").style.display="block";
+      }catch(e){}
+    }
+
+    // ── Annulation Five ────────────────────────────────────────────────────────────────
+    let cancelState=false;
+
+    async function loadCancelStatus() {
+      const key=dateKey("five",sessions.five[selectedIdx]);
+      try{
+        const data=await api("getCancelStatus",{week:key});
+        cancelState=data.cancelled||false;
+        renderCancelUI(cancelState,data.message||"");
+      }catch(e){}
+    }
+
+    function renderCancelUI(cancelled,message) {
+      const card=document.getElementById("cancel-card");
+      const badge=document.getElementById("cancel-badge");
+      const btn=document.getElementById("cancel-btn");
+      const notice=document.getElementById("cancel-notice");
+      const noticemsg=document.getElementById("cancel-notice-msg");
+      if(cancelled){
+        card.className="cancel-card active";
+        badge.className="cancel-badge on";badge.textContent="ANNULÉE ❌";
+        btn.className="btn-cancel-toggle btn-cancel-off";btn.textContent="Rétablir";
+        notice.style.display="block";
+        noticemsg.textContent=message||"Cette séance a été annulée.";
+        document.getElementById("cancel-msg-input").value=message||"";
+      }else{
+        card.className="cancel-card inactive";
+        badge.className="cancel-badge off";badge.textContent="Non annulée";
+        btn.className="btn-cancel-toggle btn-cancel-on";btn.textContent="Annuler";
+        notice.style.display="none";
+      }
+    }
+
+    async function toggleCancel() {
+      const key=dateKey("five",sessions.five[selectedIdx]);
+      const newState=!cancelState;
+      const message=document.getElementById("cancel-msg-input").value.trim();
+      const btn=document.getElementById("cancel-btn");
+      btn.disabled=true;btn.textContent="En cours...";
+      try{
+        const data=await api("setCancel",{week:key,cancelled:String(newState),message});
+        if(data.success){
+          cancelState=newState;
+          renderCancelUI(newState,message);
+          if(newState){
+            launchConfetti(1500,["#ff5252","#ff1744","#ffffff","#ffcdd2"]);
+            if(swReg&&Notification.permission==="granted"){
+              swReg.showNotification("❌ Séance annulée",{body:"La séance Five de ce mardi a été annulée."+(message?" "+message:""),tag:"cancel-"+key});
+            }
+          }
+        }
+      }catch(e){alert("Erreur de connexion.");}
+      btn.disabled=false;
     }
 
 // ── Utils ─────────────────────────────────────────────────────────
