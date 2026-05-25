@@ -288,45 +288,45 @@
     .btn-compo-random { background: linear-gradient(135deg,#e30613,#0032a0); color: #fff; }
     .btn-compo-save   { background: rgba(0,230,118,.15); border: 1px solid rgba(0,230,118,.3); color: #00e676; }
     .btn-compo-reset  { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1); color: rgba(255,255,255,.4); }
-    .compo-teams { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .compo-team { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 14px; }
-    .compo-team-header { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-    .compo-team.team-a .compo-team-header { color: #e30613; }
-    .compo-team.team-b .compo-team-header { color: #0032a0; border-left: none; }
-
-    /* Terrain SVG */
-    .compo-pitch-wrap { position: relative; margin-bottom: 14px; }
-    .compo-pitch { width: 100%; border-radius: 10px; display: block; }
-    .pitch-players { position: absolute; inset: 0; }
-
-    /* Slots drag & drop */
-    .compo-slots { display: flex; flex-direction: column; gap: 6px; }
-    .compo-slot-group { display: flex; flex-direction: column; gap: 4px; }
-    .compo-slot-label { font-size: 9px; font-weight: 700; letter-spacing: 1px; color: rgba(255,255,255,.2); text-transform: uppercase; margin-bottom: 2px; }
-    .compo-slot {
-      min-height: 36px; border-radius: 9px; border: 1px dashed rgba(255,255,255,.15);
-      display: flex; align-items: center; padding: 4px 8px; gap: 6px;
-      transition: all .2s; cursor: default; font-size: 13px;
-    }
-    .compo-slot.has-player { border-style: solid; border-color: rgba(255,255,255,.12); background: rgba(255,255,255,.05); }
-    .compo-slot.team-a-slot.has-player { border-color: rgba(227,6,19,.25); background: rgba(227,6,19,.08); }
-    .compo-slot.team-b-slot.has-player { border-color: rgba(0,50,160,.35); background: rgba(0,50,160,.12); }
-    .compo-slot.drag-over { border-color: #ffab40; background: rgba(255,171,64,.1); }
-    .compo-slot .slot-name { flex: 1; font-size: 13px; font-weight: 500; }
-    .compo-slot .slot-empty { font-size: 12px; color: rgba(255,255,255,.2); font-style: italic; }
 
     /* Pool joueurs */
     .compo-pool { display: flex; flex-wrap: wrap; gap: 6px; min-height: 40px; padding: 8px; background: rgba(255,255,255,.03); border-radius: 10px; border: 1px dashed rgba(255,255,255,.1); }
     .compo-pool.drag-over { border-color: #ffab40; background: rgba(255,171,64,.05); }
-    .compo-chip {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 5px 10px; border-radius: 20px; cursor: grab;
-      font-size: 12px; font-weight: 600; user-select: none;
-      -webkit-user-select: none; touch-action: none;
-      transition: opacity .2s, transform .1s;
-    }
+    .compo-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 20px; cursor: grab; font-size: 12px; font-weight: 600; user-select: none; -webkit-user-select: none; touch-action: none; transition: opacity .2s, transform .1s; }
     .compo-chip:active { cursor: grabbing; opacity: .7; transform: scale(.95); }
     .compo-chip.dragging { opacity: .4; }
+
+    /* Terrain visuel */
+    .pitch-container { position: relative; border-radius: 10px; overflow: hidden; }
+    .pitch-svg { width: 100%; display: block; border-radius: 10px; }
+    .pitch-overlay { position: absolute; inset: 0; }
+    .pitch-player {
+      position: absolute; transform: translate(-50%, -50%);
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      cursor: grab; -webkit-tap-highlight-color: transparent;
+      transition: transform .15s;
+    }
+    .pitch-player:active { cursor: grabbing; }
+    .pitch-player-inner {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,.15); border: 2px dashed rgba(255,255,255,.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 800; color: #fff;
+      transition: all .2s;
+    }
+    .pitch-player.has-player .pitch-player-inner {
+      border-style: solid; border-width: 2px;
+    }
+    .pitch-player[data-team="a"].has-player .pitch-player-inner { background: rgba(227,6,19,.85); border-color: #ff6b6b; }
+    .pitch-player[data-team="b"].has-player .pitch-player-inner { background: rgba(0,50,160,.85); border-color: #4d79ff; }
+    .pitch-player.drag-over .pitch-player-inner { border-color: #ffab40; background: rgba(255,171,64,.4); }
+    .pitch-player-name {
+      font-size: 8px; font-weight: 700; color: #fff; text-align: center;
+      background: rgba(0,0,0,.6); border-radius: 4px; padding: 1px 4px;
+      white-space: nowrap; max-width: 55px; overflow: hidden; text-overflow: ellipsis;
+      display: none;
+    }
+    .pitch-player.has-player .pitch-player-name { display: block; }
 
     .compo-save-msg { font-size: 12px; color: #00e676; font-family:'Space Mono',monospace; margin-top: 8px; }
     @keyframes bounce { from { transform: translateY(0) scale(1); } to { transform: translateY(-20px) scale(1.1); } }
@@ -541,52 +541,73 @@
 
         <!-- Pool joueurs non assignés -->
         <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.3);text-transform:uppercase;margin-bottom:6px;">Joueurs disponibles</div>
-        <div class="compo-pool" id="compo-pool" 
+        <div class="compo-pool" id="compo-pool"
              ondragover="event.preventDefault();this.classList.add('drag-over')"
              ondragleave="this.classList.remove('drag-over')"
              ondrop="dropToPool(event)">
         </div>
 
-        <div class="compo-teams" style="margin-top:14px;">
-          <!-- Team A -->
-          <div class="compo-team team-a">
-            <div class="compo-team-header">🔴 Équipe A</div>
-            <div class="compo-slots" id="slots-a">
-              <div class="compo-slot-group">
-                <div class="compo-slot-label">⬆️ Attaquants</div>
-                <div class="compo-slot team-a-slot" data-team="a" data-pos="att0" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><span class="slot-empty">Glisser un joueur</span></div>
-                <div class="compo-slot team-a-slot" data-team="a" data-pos="att1" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><span class="slot-empty">Glisser un joueur</span></div>
-              </div>
-              <div class="compo-slot-group">
-                <div class="compo-slot-label">🛡️ Défenseurs</div>
-                <div class="compo-slot team-a-slot" data-team="a" data-pos="def0" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><span class="slot-empty">Glisser un joueur</span></div>
-                <div class="compo-slot team-a-slot" data-team="a" data-pos="def1" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><span class="slot-empty">Glisser un joueur</span></div>
-              </div>
-              <div class="compo-slot-group">
-                <div class="compo-slot-label">🧤 Gardien</div>
-                <div class="compo-slot team-a-slot" data-team="a" data-pos="gk" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><span class="slot-empty">Glisser un joueur</span></div>
-              </div>
-            </div>
+        <!-- Terrain horizontal — Équipe A à gauche, Équipe B à droite -->
+        <div style="margin-top:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding:0 4px;">
+            <span style="font-size:12px;font-weight:700;color:#e30613;letter-spacing:1px;">🔴 ÉQUIPE A</span>
+            <span style="font-size:12px;font-weight:700;color:#4d79ff;letter-spacing:1px;">ÉQUIPE B 🔵</span>
           </div>
+          <div class="pitch-container" id="pitch-main">
+            <svg class="pitch-svg" viewBox="0 0 420 260" xmlns="http://www.w3.org/2000/svg">
+              <!-- Fond vert avec rayures verticales alternées -->
+              <rect width="420" height="260" fill="#2e7d32"/>
+              <rect x="0"   y="0" width="60"  height="260" fill="rgba(0,0,0,.06)"/>
+              <rect x="120" y="0" width="60"  height="260" fill="rgba(0,0,0,.06)"/>
+              <rect x="240" y="0" width="60"  height="260" fill="rgba(0,0,0,.06)"/>
+              <rect x="360" y="0" width="60"  height="260" fill="rgba(0,0,0,.06)"/>
+              <!-- Bordure -->
+              <rect x="1" y="1" width="418" height="258" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
+              <!-- Ligne médiane verticale -->
+              <line x1="210" y1="0" x2="210" y2="260" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
+              <!-- Cercle central -->
+              <circle cx="210" cy="130" r="38" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
+              <circle cx="210" cy="130" r="3" fill="rgba(255,255,255,.8)"/>
+              <!-- Labels A et B en filigrane -->
+              <text x="105" y="145" text-anchor="middle" fill="rgba(255,255,255,.12)" font-size="50" font-weight="900" font-family="Arial">A</text>
+              <text x="315" y="145" text-anchor="middle" fill="rgba(255,255,255,.12)" font-size="50" font-weight="900" font-family="Arial">B</text>
+              <!-- Surface réparation A (gauche) -->
+              <rect x="1"  y="80" width="55" height="100" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.5"/>
+              <rect x="1"  y="100" width="22" height="60" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.5"/>
+              <!-- But A -->
+              <rect x="-7" y="105" width="10" height="50" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2"/>
+              <!-- Point penalty A -->
+              <circle cx="70" cy="130" r="2.5" fill="rgba(255,255,255,.6)"/>
+              <!-- Surface réparation B (droite) -->
+              <rect x="364" y="80" width="55" height="100" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.5"/>
+              <rect x="397" y="100" width="22" height="60" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.5"/>
+              <!-- But B -->
+              <rect x="417" y="105" width="10" height="50" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2"/>
+              <!-- Point penalty B -->
+              <circle cx="350" cy="130" r="2.5" fill="rgba(255,255,255,.6)"/>
+            </svg>
 
-          <!-- Team B -->
-          <div class="compo-team team-b">
-            <div class="compo-team-header">🔵 Équipe B</div>
-            <div class="compo-slots" id="slots-b">
-              <div class="compo-slot-group">
-                <div class="compo-slot-label">⬆️ Attaquants</div>
-                <div class="compo-slot team-b-slot" data-team="b" data-pos="att0" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><span class="slot-empty">Glisser un joueur</span></div>
-                <div class="compo-slot team-b-slot" data-team="b" data-pos="att1" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><span class="slot-empty">Glisser un joueur</span></div>
-              </div>
-              <div class="compo-slot-group">
-                <div class="compo-slot-label">🛡️ Défenseurs</div>
-                <div class="compo-slot team-b-slot" data-team="b" data-pos="def0" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><span class="slot-empty">Glisser un joueur</span></div>
-                <div class="compo-slot team-b-slot" data-team="b" data-pos="def1" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><span class="slot-empty">Glisser un joueur</span></div>
-              </div>
-              <div class="compo-slot-group">
-                <div class="compo-slot-label">🧤 Gardien</div>
-                <div class="compo-slot team-b-slot" data-team="b" data-pos="gk" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><span class="slot-empty">Glisser un joueur</span></div>
-              </div>
+            <!-- Overlay joueurs -->
+            <div class="pitch-overlay">
+              <!-- ÉQUIPE A — moitié gauche -->
+              <!-- Attaquants A (près de la ligne médiane) -->
+              <div class="pitch-player" data-team="a" data-pos="att0" style="left:37%;top:22%" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><div class="pitch-player-inner"></div><span class="pitch-player-name"></span></div>
+              <div class="pitch-player" data-team="a" data-pos="att1" style="left:37%;top:62%" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><div class="pitch-player-inner"></div><span class="pitch-player-name"></span></div>
+              <!-- Défenseurs A -->
+              <div class="pitch-player" data-team="a" data-pos="def0" style="left:20%;top:22%" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><div class="pitch-player-inner"></div><span class="pitch-player-name"></span></div>
+              <div class="pitch-player" data-team="a" data-pos="def1" style="left:20%;top:62%" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><div class="pitch-player-inner"></div><span class="pitch-player-name"></span></div>
+              <!-- Gardien A -->
+              <div class="pitch-player" data-team="a" data-pos="gk"   style="left:5%;top:42%"  ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><div class="pitch-player-inner"></div><span class="pitch-player-name"></span></div>
+
+              <!-- ÉQUIPE B — moitié droite -->
+              <!-- Attaquants B (près de la ligne médiane) -->
+              <div class="pitch-player" data-team="b" data-pos="att0" style="left:57%;top:22%" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><div class="pitch-player-inner"></div><span class="pitch-player-name"></span></div>
+              <div class="pitch-player" data-team="b" data-pos="att1" style="left:57%;top:62%" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><div class="pitch-player-inner"></div><span class="pitch-player-name"></span></div>
+              <!-- Défenseurs B -->
+              <div class="pitch-player" data-team="b" data-pos="def0" style="left:74%;top:22%" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><div class="pitch-player-inner"></div><span class="pitch-player-name"></span></div>
+              <div class="pitch-player" data-team="b" data-pos="def1" style="left:74%;top:62%" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><div class="pitch-player-inner"></div><span class="pitch-player-name"></span></div>
+              <!-- Gardien B -->
+              <div class="pitch-player" data-team="b" data-pos="gk"   style="left:91%;top:42%" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><div class="pitch-player-inner"></div><span class="pitch-player-name"></span></div>
             </div>
           </div>
         </div>
@@ -1134,15 +1155,42 @@
       const all=(wd.players||[]).map(function(p){return p.name;});
       const assigned=new Set(Object.values(compoState.a).concat(Object.values(compoState.b)).filter(Boolean));
       const pool=all.filter(function(n){return !assigned.has(n);});
+
+      // Pool
       const poolEl=document.getElementById("compo-pool");
       poolEl.innerHTML=pool.length?pool.map(function(n){return makeChip(n,"pool",null,null);}).join(""):'<span style="font-size:12px;color:rgba(255,255,255,.2);font-style:italic;">Tous assignés ✓</span>';
+
+      // Terrain - update each pitch player spot
       ["a","b"].forEach(function(team){
         ["att0","att1","def0","def1","gk"].forEach(function(pos){
-          const slot=document.querySelector('.compo-slot[data-team="'+team+'"][data-pos="'+pos+'"]');
-          if(!slot)return;
+          const spot=document.querySelector('.pitch-player[data-team="'+team+'"][data-pos="'+pos+'"]');
+          if(!spot)return;
           const player=compoState[team][pos];
-          slot.innerHTML=player?makeChip(player,"slot",team,pos):'<span class="slot-empty">Glisser un joueur</span>';
-          slot.classList.toggle("has-player",!!player);
+          const inner=spot.querySelector(".pitch-player-inner");
+          const nameEl=spot.querySelector(".pitch-player-name");
+          if(player){
+            spot.classList.add("has-player");
+            spot.dataset.playerName=player;
+            const color=getAvatarColor(player);
+            inner.textContent=getInitials(player);
+            nameEl.textContent=player.split(" ")[0]; // prénom seulement
+            // Make draggable
+            spot.draggable=true;
+            spot.ondragstart=function(e){
+              draggedPlayer={name:player,from:"slot",team:team,pos:pos};
+              e.dataTransfer.effectAllowed="move";
+            };
+            spot.ondragend=function(){
+              document.querySelectorAll(".drag-over").forEach(function(el){el.classList.remove("drag-over");});
+            };
+          }else{
+            spot.classList.remove("has-player");
+            spot.dataset.playerName="";
+            inner.textContent="";
+            nameEl.textContent="";
+            spot.draggable=false;
+            spot.ondragstart=null;
+          }
         });
       });
       bindChipEvents();
