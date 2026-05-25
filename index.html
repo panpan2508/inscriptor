@@ -199,6 +199,137 @@
     .fade { transition: opacity .2s ease; }
     .fade.out { opacity: 0; }
 
+
+    /* ── Confettis ── */
+    #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 9999; }
+
+    /* ── Full overlay ── */
+    .full-overlay {
+      position: fixed; inset: 0; z-index: 9998;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px;
+      background: rgba(0,0,0,.7); backdrop-filter: blur(8px);
+      animation: fadeIn .4s ease;
+    }
+    .full-overlay .fo-emoji { font-size: 80px; animation: bounce 0.6s ease infinite alternate; }
+    .full-overlay .fo-title { font-size: 48px; font-weight: 900; letter-spacing: -2px; text-align: center; line-height: 1; }
+    .full-overlay .fo-sub   { font-size: 16px; color: rgba(255,255,255,.5); font-family: 'Space Mono',monospace; }
+    .full-overlay .fo-close { margin-top: 20px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); border-radius: 12px; padding: 10px 24px; color: #fff; font-family:'Outfit',sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+    /* ── Avatars ── */
+    .player-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800; color: #000; flex-shrink: 0;
+    }
+
+    /* ── Classement ── */
+    .leaderboard-card { cursor: pointer; }
+    .leaderboard-card .card-title { display: flex; align-items: center; justify-content: space-between; }
+    .lb-toggle { font-size: 11px; color: rgba(255,255,255,.3); font-family:'Space Mono',monospace; }
+    .lb-content { overflow: hidden; max-height: 0; transition: max-height .4s ease; }
+    .lb-content.open { max-height: 800px; }
+    .lb-row { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
+    .lb-row:last-child { border-bottom: none; }
+    .lb-rank { font-family:'Space Mono',monospace; font-size: 12px; color: rgba(255,255,255,.25); width: 24px; text-align: right; }
+    .lb-rank.gold   { color: #ffd700; }
+    .lb-rank.silver { color: #c0c0c0; }
+    .lb-rank.bronze { color: #cd7f32; }
+    .lb-name { flex: 1; font-size: 14px; font-weight: 500; }
+    .lb-count { font-family:'Space Mono',monospace; font-size: 12px; color: rgba(255,255,255,.35); }
+    .lb-bar-wrap { width: 60px; height: 4px; background: rgba(255,255,255,.08); border-radius: 2px; overflow: hidden; }
+    .lb-bar { height: 4px; border-radius: 2px; transition: width .6s ease; }
+    .lb-empty { color: rgba(255,255,255,.2); font-size: 13px; font-style: italic; padding: 12px 0; }
+
+    /* ── 1er avril ── */
+    .april-banner { background: linear-gradient(135deg,rgba(255,165,0,.15),rgba(255,100,0,.1)); border: 1px solid rgba(255,165,0,.3); border-radius: 14px; padding: 12px 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+    .april-banner-text { font-size: 13px; color: #ffab40; }
+    .april-banner-text strong { display: block; font-size: 15px; color: #ff8c00; }
+
+
+    /* ── Abonnés rappel Bad ── */
+    .subscribe-card { background: rgba(0,230,118,.06); border: 1px solid rgba(0,230,118,.2); border-radius: 16px; padding: 18px 22px; margin-bottom: 18px; }
+    .subscribe-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+    .subscribe-title { font-size: 13px; font-weight: 700; color: #00e676; }
+    .subscribe-sub { font-size: 11px; color: rgba(255,255,255,.3); margin-bottom: 14px; }
+    .subscribe-form { display: flex; flex-direction: column; gap: 8px; }
+    .subscribe-row { display: flex; gap: 8px; }
+    .subscribe-list { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.07); }
+    .subscribe-list-title { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: rgba(255,255,255,.3); text-transform: uppercase; margin-bottom: 8px; }
+    .subscriber-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.04); font-size: 13px; }
+    .subscriber-row:last-child { border-bottom: none; }
+    .btn-unsub { background: none; border: none; color: rgba(255,82,82,.5); cursor: pointer; font-size: 12px; font-family:'Outfit',sans-serif; }
+    .btn-unsub:hover { color: #ff5252; }
+
+    /* ── Annulation Five ── */
+    .cancel-card { border-radius: 16px; padding: 16px 20px; margin-bottom: 18px; transition: all .3s; }
+    .cancel-card.active   { background: rgba(255,82,82,.1); border: 1px solid rgba(255,82,82,.35); }
+    .cancel-card.inactive { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); }
+    .cancel-header { display: flex; align-items: center; justify-content: space-between; }
+    .cancel-title { font-size: 13px; font-weight: 700; }
+    .cancel-card.active   .cancel-title { color: #ff5252; }
+    .cancel-card.inactive .cancel-title { color: rgba(255,255,255,.5); }
+    .cancel-badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+    .cancel-badge.on  { background: rgba(255,82,82,.2); color: #ff5252; }
+    .cancel-badge.off { background: rgba(255,255,255,.07); color: rgba(255,255,255,.3); }
+    .cancel-toggle { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+    .cancel-msg-input { flex: 1; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 10px 14px; color: #fff; font-size: 13px; font-family:'Outfit',sans-serif; outline: none; }
+    .cancel-msg-input:focus { border-color: rgba(255,82,82,.5); }
+    .btn-cancel-toggle { border: none; border-radius: 10px; padding: 10px 16px; font-family:'Outfit',sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all .2s; }
+    .btn-cancel-on  { background: linear-gradient(135deg,#ff5252,#d32f2f); color: #fff; }
+    .btn-cancel-off { background: linear-gradient(135deg,#00e676,#00c853); color: #000; }
+    .cancel-notice { background: rgba(255,82,82,.08); border: 1px solid rgba(255,82,82,.25); border-radius: 12px; padding: 14px 18px; text-align: center; color: #ff5252; font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+    .cancel-notice strong { display: block; font-size: 16px; margin-bottom: 4px; }
+
+    /* ── Compositions Five ── */
+    .compo-section { margin-bottom: 18px; }
+    .compo-actions { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .btn-compo { border: none; border-radius: 10px; padding: 9px 16px; font-family:'Outfit',sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all .2s; -webkit-tap-highlight-color: transparent; }
+    .btn-compo-random { background: linear-gradient(135deg,#e30613,#0032a0); color: #fff; }
+    .btn-compo-save   { background: rgba(0,230,118,.15); border: 1px solid rgba(0,230,118,.3); color: #00e676; }
+    .btn-compo-reset  { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1); color: rgba(255,255,255,.4); }
+    .compo-teams { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .compo-team { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 14px; }
+    .compo-team-header { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .compo-team.team-a .compo-team-header { color: #e30613; }
+    .compo-team.team-b .compo-team-header { color: #0032a0; border-left: none; }
+
+    /* Terrain SVG */
+    .compo-pitch-wrap { position: relative; margin-bottom: 14px; }
+    .compo-pitch { width: 100%; border-radius: 10px; display: block; }
+    .pitch-players { position: absolute; inset: 0; }
+
+    /* Slots drag & drop */
+    .compo-slots { display: flex; flex-direction: column; gap: 6px; }
+    .compo-slot-group { display: flex; flex-direction: column; gap: 4px; }
+    .compo-slot-label { font-size: 9px; font-weight: 700; letter-spacing: 1px; color: rgba(255,255,255,.2); text-transform: uppercase; margin-bottom: 2px; }
+    .compo-slot {
+      min-height: 36px; border-radius: 9px; border: 1px dashed rgba(255,255,255,.15);
+      display: flex; align-items: center; padding: 4px 8px; gap: 6px;
+      transition: all .2s; cursor: default; font-size: 13px;
+    }
+    .compo-slot.has-player { border-style: solid; border-color: rgba(255,255,255,.12); background: rgba(255,255,255,.05); }
+    .compo-slot.team-a-slot.has-player { border-color: rgba(227,6,19,.25); background: rgba(227,6,19,.08); }
+    .compo-slot.team-b-slot.has-player { border-color: rgba(0,50,160,.35); background: rgba(0,50,160,.12); }
+    .compo-slot.drag-over { border-color: #ffab40; background: rgba(255,171,64,.1); }
+    .compo-slot .slot-name { flex: 1; font-size: 13px; font-weight: 500; }
+    .compo-slot .slot-empty { font-size: 12px; color: rgba(255,255,255,.2); font-style: italic; }
+
+    /* Pool joueurs */
+    .compo-pool { display: flex; flex-wrap: wrap; gap: 6px; min-height: 40px; padding: 8px; background: rgba(255,255,255,.03); border-radius: 10px; border: 1px dashed rgba(255,255,255,.1); }
+    .compo-pool.drag-over { border-color: #ffab40; background: rgba(255,171,64,.05); }
+    .compo-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 10px; border-radius: 20px; cursor: grab;
+      font-size: 12px; font-weight: 600; user-select: none;
+      -webkit-user-select: none; touch-action: none;
+      transition: opacity .2s, transform .1s;
+    }
+    .compo-chip:active { cursor: grabbing; opacity: .7; transform: scale(.95); }
+    .compo-chip.dragging { opacity: .4; }
+
+    .compo-save-msg { font-size: 12px; color: #00e676; font-family:'Space Mono',monospace; margin-top: 8px; }
+    @keyframes bounce { from { transform: translateY(0) scale(1); } to { transform: translateY(-20px) scale(1.1); } }
     @keyframes fadeIn    { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
     @keyframes spin      { to { transform:rotate(360deg); } }
     @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.7);} }
@@ -210,6 +341,27 @@
   <div id="glow2"></div>
 
   <div class="container">
+
+
+    <!-- Confetti canvas -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Full overlay (list full / easter eggs) -->
+    <div id="full-overlay" style="display:none" class="full-overlay">
+      <div class="fo-emoji" id="fo-emoji">🎉</div>
+      <div class="fo-title" id="fo-title">COMPLET !</div>
+      <div class="fo-sub"   id="fo-sub">La soirée est complète</div>
+      <button class="fo-close" onclick="closeOverlay()">OK super !</button>
+    </div>
+
+    <!-- 1er avril banner -->
+    <div id="april-banner" class="april-banner" style="display:none">
+      <span style="font-size:24px;">🐟</span>
+      <div class="april-banner-text">
+        <strong>Poisson d'avril !</strong>
+        Les vrais noms sont cachés aujourd'hui 🎣
+      </div>
+    </div>
 
     <!-- Install banner -->
     <div class="install-banner" id="install-banner">
@@ -335,11 +487,129 @@
       </div>
     </div>
 
+
+    <!-- Abonnés rappel (Bad only) -->
+    <div id="subscribe-section" style="display:block">
+      <div class="subscribe-card">
+        <div class="subscribe-header">
+          <div class="subscribe-title">📬 Rappels hebdo</div>
+        </div>
+        <div class="subscribe-sub">Reçois un mail chaque lundi à 9h pour t'inscrire à la soirée du jeudi.</div>
+        <div class="subscribe-form" id="subscribe-form">
+          <div class="subscribe-row">
+            <input type="text"  id="sub-name"  placeholder="Prénom Nom" style="font-size:13px;padding:10px 14px;" />
+            <input type="email" id="sub-email" placeholder="Email" style="font-size:13px;padding:10px 14px;" />
+          </div>
+          <button class="btn-primary btn-bad" onclick="subscribe()" style="padding:10px 18px;font-size:13px;align-self:flex-start;">S'abonner</button>
+          <p id="sub-msg" style="font-size:12px;margin-top:4px;"></p>
+        </div>
+        <div class="subscribe-list" id="sub-list" style="display:none">
+          <div class="subscribe-list-title">Abonnés (<span id="sub-count">0</span>)</div>
+          <div id="sub-list-items"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Annulation Five -->
+    <div id="cancel-section" style="display:none">
+      <div class="cancel-notice" id="cancel-notice" style="display:none">
+        <strong>❌ Séance annulée</strong>
+        <span id="cancel-notice-msg">Cette séance a été annulée.</span>
+      </div>
+      <div class="cancel-card inactive" id="cancel-card">
+        <div class="cancel-header">
+          <div class="cancel-title">⚠️ Annuler la séance</div>
+          <span class="cancel-badge off" id="cancel-badge">Non annulée</span>
+        </div>
+        <div class="cancel-toggle">
+          <input type="text" id="cancel-msg-input" class="cancel-msg-input" placeholder="Motif (optionnel)" maxlength="120" />
+          <button class="btn-cancel-toggle btn-cancel-on" id="cancel-btn" onclick="toggleCancel()">Annuler</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compositions Five -->
+    <div id="compo-section" style="display:none">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:12px;">⚽ Compositions</div>
+
+        <div class="compo-actions">
+          <button class="btn-compo btn-compo-random" onclick="randomizeTeams()">🎲 Générer aléatoirement</button>
+          <button class="btn-compo btn-compo-save"   onclick="saveCompo()">💾 Sauvegarder</button>
+          <button class="btn-compo btn-compo-reset"  onclick="resetCompo()">↺ Réinitialiser</button>
+        </div>
+
+        <!-- Pool joueurs non assignés -->
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.3);text-transform:uppercase;margin-bottom:6px;">Joueurs disponibles</div>
+        <div class="compo-pool" id="compo-pool" 
+             ondragover="event.preventDefault();this.classList.add('drag-over')"
+             ondragleave="this.classList.remove('drag-over')"
+             ondrop="dropToPool(event)">
+        </div>
+
+        <div class="compo-teams" style="margin-top:14px;">
+          <!-- Team A -->
+          <div class="compo-team team-a">
+            <div class="compo-team-header">🔴 Équipe A</div>
+            <div class="compo-slots" id="slots-a">
+              <div class="compo-slot-group">
+                <div class="compo-slot-label">⬆️ Attaquants</div>
+                <div class="compo-slot team-a-slot" data-team="a" data-pos="att0" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><span class="slot-empty">Glisser un joueur</span></div>
+                <div class="compo-slot team-a-slot" data-team="a" data-pos="att1" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><span class="slot-empty">Glisser un joueur</span></div>
+              </div>
+              <div class="compo-slot-group">
+                <div class="compo-slot-label">🛡️ Défenseurs</div>
+                <div class="compo-slot team-a-slot" data-team="a" data-pos="def0" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><span class="slot-empty">Glisser un joueur</span></div>
+                <div class="compo-slot team-a-slot" data-team="a" data-pos="def1" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><span class="slot-empty">Glisser un joueur</span></div>
+              </div>
+              <div class="compo-slot-group">
+                <div class="compo-slot-label">🧤 Gardien</div>
+                <div class="compo-slot team-a-slot" data-team="a" data-pos="gk" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><span class="slot-empty">Glisser un joueur</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Team B -->
+          <div class="compo-team team-b">
+            <div class="compo-team-header">🔵 Équipe B</div>
+            <div class="compo-slots" id="slots-b">
+              <div class="compo-slot-group">
+                <div class="compo-slot-label">⬆️ Attaquants</div>
+                <div class="compo-slot team-b-slot" data-team="b" data-pos="att0" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><span class="slot-empty">Glisser un joueur</span></div>
+                <div class="compo-slot team-b-slot" data-team="b" data-pos="att1" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><span class="slot-empty">Glisser un joueur</span></div>
+              </div>
+              <div class="compo-slot-group">
+                <div class="compo-slot-label">🛡️ Défenseurs</div>
+                <div class="compo-slot team-b-slot" data-team="b" data-pos="def0" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><span class="slot-empty">Glisser un joueur</span></div>
+                <div class="compo-slot team-b-slot" data-team="b" data-pos="def1" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><span class="slot-empty">Glisser un joueur</span></div>
+              </div>
+              <div class="compo-slot-group">
+                <div class="compo-slot-label">🧤 Gardien</div>
+                <div class="compo-slot team-b-slot" data-team="b" data-pos="gk" ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)" ondrop="dropToSlot(event)"><span class="slot-empty">Glisser un joueur</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="compo-save-msg" id="compo-save-msg" style="display:none"></p>
+      </div>
+    </div>
+
+    <!-- Classement -->
+    <div class="card leaderboard-card" onclick="toggleLeaderboard()">
+      <div class="card-title">
+        <span>🏆 Classement de présence</span>
+        <span class="lb-toggle" id="lb-toggle">▼ Voir</span>
+      </div>
+      <div class="lb-content" id="lb-content">
+        <div id="lb-list"><div class="lb-empty">Chargement...</div></div>
+      </div>
+    </div>
+
   </div>
 
   <script>
     // ── Config ────────────────────────────────────────────────────────
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCg0QqQ3ViwKVNRJeS-G6IPA4bo2DG8EklUXQUUPF_tleMjp2XJJ-Xih83xtS4I6Fr4g/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby_TzaSgR8TW8c0n4jpr8RrTCAsksYMfkC4DnJe_-HMvALrDp__b-c4qjU-OP_GvglafA/exec";
 
     const SPORTS = {
       bad: {
@@ -491,6 +761,12 @@
 
       renderTabs(); loadPlayers(); prefetchAll(); loadChat();
       updateNotifButton();
+      // Show/hide sport-specific sections
+      document.getElementById("subscribe-section").style.display = sport==="bad"  ? "block" : "none";
+      document.getElementById("cancel-section").style.display    = sport==="five" ? "block" : "none";
+      document.getElementById("compo-section").style.display     = sport==="five" ? "block" : "none";
+      if (sport==="bad")  { loadSubscribers(); }
+      if (sport==="five") { loadCancelStatus(); loadCompo(); }
     }
 
     // ── Dates ─────────────────────────────────────────────────────────
@@ -536,7 +812,11 @@
     }
     function selectWeek(idx) {
       selectedIdx=idx; renderTabs(); loadPlayers();
-      if (currentSport==="five") renderPaymentLink(dateKey("five",sessions.five[idx]));
+      if (currentSport==="five") {
+        renderPaymentLink(dateKey("five",sessions.five[idx]));
+        loadCancelStatus();
+        loadCompo();
+      }
     }
 
     // ── Load ──────────────────────────────────────────────────────────
@@ -606,7 +886,8 @@
 
       const listEl=document.getElementById("player-list");
       if (!players.length&&!waitlist.length){listEl.innerHTML='<p class="empty">Aucun inscrit pour l\'instant. Sois le premier ! '+(sport==="bad"?"🏸":"⚽")+'</p>';return;}
-      let html=players.map((p,i)=>'<div class="player-item"><div class="player-left"><span class="player-num">'+String(i+1).padStart(2,"0")+'</span><span class="player-name">'+escHtml(p.name)+(p.email?'<span class="player-email-icon">📧</span>':"")+'</span></div><button class="btn-remove" onclick="removePlayer(\''+escAttr(p.name)+'\')">Retirer</button></div>').join("");
+      const displayPlayers = isAprilFool() ? applyAprilFool(players) : players;
+      let html=displayPlayers.map((p,i)=>'<div class="player-item"><div class="player-left">'+makeAvatar(p.name)+'<span class="player-name">'+escHtml(p.name)+(p.email?'<span class="player-email-icon">📧</span>':"")+'</span></div><button class="btn-remove" onclick="removePlayer(\\''+escAttr(players[i].name)+'\\')">Retirer</button></div>').join("");
       if (waitlist.length){
         html+='<div class="waitlist-separator"><div class="waitlist-separator-line"></div><div class="waitlist-separator-text">⏳ Liste d\'attente</div><div class="waitlist-separator-line"></div></div>';
         html+=waitlist.map((p,i)=>'<div class="player-item waitlist-item"><div class="player-left"><span class="player-num">#'+(i+1)+'</span><span class="player-name">'+escHtml(p.name)+(p.email?'<span class="player-email-icon">📧</span>':"")+'</span></div><div style="display:flex;align-items:center;gap:6px"><span class="waitlist-badge">Attente '+(i+1)+'/'+cfg.waitlistMax+'</span><button class="btn-remove" onclick="removePlayer(\''+escAttr(p.name)+'\')">Retirer</button></div></div>').join("");
@@ -633,9 +914,27 @@
           renderPlayers(weekData[key]); renderTabs();
           document.getElementById("name-input").value="";
           document.getElementById("email-input").value="";
-          if (data.status==="waitlist") showMsg("⏳ "+name+" est en liste d'attente (position "+data.position+"/"+data.waitlistMax+") !","waitlist");
-          else showMsg("✓ "+name+" est inscrit·e !","success");
+          if (data.status==="waitlist") {
+            showMsg("⏳ "+name+" est en liste d'attente (position "+data.position+"/"+data.waitlistMax+") !","waitlist");
+          } else {
+            showMsg("✓ "+name+" est inscrit·e !","success");
+            launchConfetti(2000);
+            const newCount=(data.players||[]).length, newMax=SPORTS[currentSport].maxFn();
+            if (newCount>=newMax) { setTimeout(()=>{ showOverlay(currentSport==="bad"?"🏸":"⚽","COMPLET !","La soirée est complète — liste d'attente ouverte !"); },800); }
+            launchConfetti(2000);
+            // Si la liste vient d'être complète
+            const newCount = (data.players||[]).length;
+            const newMax   = SPORTS[currentSport].maxFn();
+            if (newCount >= newMax) {
+              setTimeout(()=>{
+                const emoji = currentSport==="bad" ? "🏸" : "⚽";
+                showOverlay(emoji, "COMPLET !", "La soirée est complète — liste d'attente ouverte !");
+              }, 800);
+            }
+          }
           setTimeout(clearMsg,4000);
+          // Mettre à jour le classement si ouvert
+          if (lbOpen) { lbBuilt=false; buildLeaderboard(); lbBuilt=true; }
         } else showMsg(data.error||"Erreur.","error");
       } catch(e){showMsg("Erreur de connexion.","error");}
       const wd2=weekData[dateKey(sport,sessions[sport][selectedIdx])]||{players:[]};
@@ -679,7 +978,242 @@
       btn.disabled=false;
     }
 
-    // ── Utils ─────────────────────────────────────────────────────────
+    
+    // ── Avatar colors ─────────────────────────────────────────────────────────
+    const AVATAR_COLORS = [
+      "#00e676","#ff9100","#40c4ff","#b388ff","#ff5252",
+      "#ffab40","#69f0ae","#ff80ab","#ea80fc","#18ffff"
+    ];
+    function getAvatarColor(name) {
+      let hash = 0;
+      for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+      return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+    }
+    function getInitials(name) {
+      const parts = name.trim().split(/\s+/);
+      if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+      return name.slice(0,2).toUpperCase();
+    }
+    function makeAvatar(name) {
+      const color = getAvatarColor(name);
+      const initials = getInitials(name);
+      return '<div class="player-avatar" style="background:' + color + '">' + initials + '</div>';
+    }
+
+    // ── Confettis ─────────────────────────────────────────────────────────────
+    function launchConfetti(duration, colors) {
+      duration = duration || 2500;
+      const canvas = document.getElementById("confetti-canvas");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const ctx = canvas.getContext("2d");
+      const sport = currentSport;
+      const defaultColors = sport === "bad"
+        ? ["#00e676","#00c853","#ffffff","#b2ffda","#69f0ae"]
+        : ["#e30613","#0032a0","#ffffff","#ff6b6b","#4d79ff"];
+      const cols = colors || defaultColors;
+      const particles = [];
+      for (let i = 0; i < 120; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          w: Math.random() * 10 + 5,
+          h: Math.random() * 6 + 3,
+          color: cols[Math.floor(Math.random() * cols.length)],
+          vx: (Math.random() - 0.5) * 4,
+          vy: Math.random() * 4 + 2,
+          angle: Math.random() * Math.PI * 2,
+          spin: (Math.random() - 0.5) * 0.2,
+          opacity: 1
+        });
+      }
+      const end = Date.now() + duration;
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const now = Date.now();
+        const remaining = (end - now) / duration;
+        particles.forEach(function(p) {
+          p.x += p.vx; p.y += p.vy; p.angle += p.spin;
+          p.opacity = Math.min(1, remaining * 3);
+          ctx.save();
+          ctx.translate(p.x + p.w/2, p.y + p.h/2);
+          ctx.rotate(p.angle);
+          ctx.globalAlpha = p.opacity;
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+          ctx.restore();
+        });
+        if (now < end) requestAnimationFrame(draw);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      draw();
+    }
+
+    // ── Overlay ───────────────────────────────────────────────────────────────
+    function showOverlay(emoji, title, sub, confettiColors) {
+      document.getElementById("fo-emoji").textContent = emoji;
+      document.getElementById("fo-title").textContent = title;
+      document.getElementById("fo-sub").textContent   = sub;
+      document.getElementById("full-overlay").style.display = "flex";
+      launchConfetti(3000, confettiColors);
+    }
+    function closeOverlay() {
+      document.getElementById("full-overlay").style.display = "none";
+    }
+
+    // ── 1er avril ─────────────────────────────────────────────────────────────
+    function isAprilFool() {
+      const d = new Date();
+      return d.getMonth() === 3 && d.getDate() === 1;
+    }
+    function applyAprilFool(players) {
+      if (!isAprilFool()) return players;
+      return players.map(function(p, i) {
+        return { name: "Poisson d'avril \uD83D\uDC1F " + String(i+1).padStart(2,"0"), email: p.email };
+      });
+    }
+    if (isAprilFool()) {
+      document.getElementById("april-banner").style.display = "flex";
+    }
+
+    // ── Leaderboard ───────────────────────────────────────────────────────────
+    let lbOpen = false;
+    let lbBuilt = false;
+
+    function toggleLeaderboard() {
+      lbOpen = !lbOpen;
+      document.getElementById("lb-content").classList.toggle("open", lbOpen);
+      document.getElementById("lb-toggle").textContent = lbOpen ? "\u25B2 Fermer" : "\u25BC Voir";
+      if (lbOpen && !lbBuilt) { buildLeaderboard(); lbBuilt = true; }
+    }
+
+    function buildLeaderboard() {
+      const sport = currentSport;
+      const prefix = SPORTS[sport].prefix;
+      const counts = {};
+      Object.keys(weekData).forEach(function(key) {
+        if (key.indexOf(prefix) !== 0) return;
+        const wd = weekData[key];
+        (wd.players || []).forEach(function(p) {
+          const n = p.name.trim();
+          if (n) counts[n] = (counts[n] || 0) + 1;
+        });
+      });
+      const sorted = Object.entries(counts).sort(function(a,b){return b[1]-a[1];});
+      const max = sorted.length ? sorted[0][1] : 1;
+      const listEl = document.getElementById("lb-list");
+      if (!sorted.length) {
+        listEl.innerHTML = '<div class="lb-empty">Pas encore de donn\u00e9es. Inscris-toi !</div>';
+        return;
+      }
+      const accent = sport === "bad" ? "#00e676" : "#e30613";
+      listEl.innerHTML = sorted.slice(0,10).map(function(entry, i) {
+        const name = entry[0], count = entry[1];
+        const color = getAvatarColor(name);
+        const barW = Math.round((count / max) * 100);
+        const rankLabel = i===0?"🥇":i===1?"🥈":i===2?"🥉":String(i+1).padStart(2,"0");
+        const rankClass = i===0?"gold":i===1?"silver":i===2?"bronze":"";
+        return '<div class="lb-row">' +
+          '<span class="lb-rank '+rankClass+'">'+rankLabel+'</span>' +
+          '<div class="player-avatar" style="background:'+color+';width:26px;height:26px;font-size:10px;">'+getInitials(name)+'</div>' +
+          '<span class="lb-name">'+escHtml(name)+'</span>' +
+          '<div class="lb-bar-wrap"><div class="lb-bar" style="width:'+barW+'%;background:'+accent+'"></div></div>' +
+          '<span class="lb-count">'+count+'&times;</span>' +
+          '</div>';
+      }).join("");
+    }
+
+    // ── Compositions Five ───────────────────────────────────────────
+    let compoState={a:{gk:null,def0:null,def1:null,att0:null,att1:null},b:{gk:null,def0:null,def1:null,att0:null,att1:null}};
+    let draggedPlayer=null;
+    async function loadCompo(){
+      const key=dateKey("five",sessions.five[selectedIdx]);
+      try{
+        const data=await api("getCompo",{week:key});
+        const tA=data.teamA||[],tB=data.teamB||[],pos=["att0","att1","def0","def1","gk"];
+        compoState.a={};compoState.b={};
+        pos.forEach(function(p,i){compoState.a[p]=tA[i]||null;compoState.b[p]=tB[i]||null;});
+        renderCompo();
+      }catch(e){}
+    }
+    function renderCompo(){
+      if(currentSport!=="five")return;
+      const wd=weekData[dateKey("five",sessions.five[selectedIdx])]||{players:[]};
+      const all=(wd.players||[]).map(function(p){return p.name;});
+      const assigned=new Set(Object.values(compoState.a).concat(Object.values(compoState.b)).filter(Boolean));
+      const pool=all.filter(function(n){return !assigned.has(n);});
+      const poolEl=document.getElementById("compo-pool");
+      poolEl.innerHTML=pool.length?pool.map(function(n){return makeChip(n,"pool",null,null);}).join(""):'<span style="font-size:12px;color:rgba(255,255,255,.2);font-style:italic;">Tous assignés ✓</span>';
+      ["a","b"].forEach(function(team){
+        ["att0","att1","def0","def1","gk"].forEach(function(pos){
+          const slot=document.querySelector('.compo-slot[data-team="'+team+'"][data-pos="'+pos+'"]');
+          if(!slot)return;
+          const player=compoState[team][pos];
+          slot.innerHTML=player?makeChip(player,"slot",team,pos):'<span class="slot-empty">Glisser un joueur</span>';
+          slot.classList.toggle("has-player",!!player);
+        });
+      });
+      bindChipEvents();
+    }
+    function makeChip(name,from,team,pos){
+      const c=getAvatarColor(name);
+      return '<div draggable="true" class="compo-chip" data-name="'+escAttr(name)+'" data-from="'+from+'" data-team="'+(team||"")+'" data-pos="'+(pos||"")+'" style="background:'+c+'22;border:1px solid '+c+'55;color:#fff;" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)"><div style="width:20px;height:20px;border-radius:50%;background:'+c+';display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#000;">'+getInitials(name)+'</div>'+escHtml(name)+'</div>';
+    }
+    function chipDragStart(e){draggedPlayer={name:e.currentTarget.dataset.name,from:e.currentTarget.dataset.from,team:e.currentTarget.dataset.team,pos:e.currentTarget.dataset.pos};e.currentTarget.classList.add("dragging");e.dataTransfer.effectAllowed="move";}
+    function chipDragEnd(e){e.currentTarget.classList.remove("dragging");document.querySelectorAll(".drag-over").forEach(function(el){el.classList.remove("drag-over");});}
+    function slotDragOver(e){e.preventDefault();e.currentTarget.classList.add("drag-over");}
+    function slotDragLeave(e){e.currentTarget.classList.remove("drag-over");}
+    function dropToSlot(e){
+      e.preventDefault();const slot=e.currentTarget;slot.classList.remove("drag-over");
+      if(!draggedPlayer)return;
+      const tt=slot.dataset.team,tp=slot.dataset.pos,ex=compoState[tt][tp];
+      if(draggedPlayer.from==="slot")compoState[draggedPlayer.team][draggedPlayer.pos]=ex;
+      compoState[tt][tp]=draggedPlayer.name;draggedPlayer=null;renderCompo();
+    }
+    function dropToPool(e){
+      e.preventDefault();e.currentTarget.classList.remove("drag-over");
+      if(!draggedPlayer||draggedPlayer.from!=="slot")return;
+      compoState[draggedPlayer.team][draggedPlayer.pos]=null;draggedPlayer=null;renderCompo();
+    }
+    function bindChipEvents(){
+      document.querySelectorAll(".compo-chip").forEach(function(chip){
+        chip.ontouchstart=function(e){
+          draggedPlayer={name:e.currentTarget.dataset.name,from:e.currentTarget.dataset.from,team:e.currentTarget.dataset.team,pos:e.currentTarget.dataset.pos};
+          const cl=e.currentTarget.cloneNode(true);cl.style.cssText="position:fixed;opacity:.8;pointer-events:none;z-index:9999;";document.body.appendChild(cl);chip._tClone=cl;
+        };
+        chip.ontouchmove=function(e){e.preventDefault();const t=e.touches[0];if(chip._tClone){chip._tClone.style.left=(t.clientX-30)+"px";chip._tClone.style.top=(t.clientY-20)+"px";}};
+        chip.ontouchend=function(e){
+          if(chip._tClone){document.body.removeChild(chip._tClone);chip._tClone=null;}
+          const t=e.changedTouches[0],el=document.elementFromPoint(t.clientX,t.clientY);
+          const slot=el&&el.closest(".compo-slot"),pool=el&&el.closest(".compo-pool");
+          if(slot)dropToSlot({preventDefault:function(){},currentTarget:slot});
+          else if(pool)dropToPool({preventDefault:function(){},currentTarget:pool});
+          draggedPlayer=null;
+        };
+      });
+    }
+    function randomizeTeams(){
+      const wd=weekData[dateKey("five",sessions.five[selectedIdx])]||{players:[]};
+      const pl=[...(wd.players||[]).map(function(p){return p.name;})];
+      for(let i=pl.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pl[i],pl[j]]=[pl[j],pl[i]];}
+      const half=Math.ceil(pl.length/2),tA=pl.slice(0,half),tB=pl.slice(half);
+      const positions=["att0","att1","def0","def1","gk"];
+      compoState.a={};compoState.b={};
+      positions.forEach(function(p,i){compoState.a[p]=tA[i]||null;compoState.b[p]=tB[i]||null;});
+      renderCompo();launchConfetti(1500);
+    }
+    function resetCompo(){compoState={a:{gk:null,def0:null,def1:null,att0:null,att1:null},b:{gk:null,def0:null,def1:null,att0:null,att1:null}};renderCompo();}
+    async function saveCompo(){
+      const key=dateKey("five",sessions.five[selectedIdx]);
+      const positions=["att0","att1","def0","def1","gk"];
+      const tA=positions.map(function(p){return compoState.a[p]||null;}),tB=positions.map(function(p){return compoState.b[p]||null;});
+      try{
+        const data=await api("saveCompo",{week:key,teamA:JSON.stringify(tA),teamB:JSON.stringify(tB)});
+        if(data.success){const msg=document.getElementById("compo-save-msg");msg.style.display="block";msg.textContent="✓ Compos sauvegardées !";setTimeout(function(){msg.style.display="none";},3000);}
+      }catch(e){alert("Erreur.");}
+    }
+
+// ── Utils ─────────────────────────────────────────────────────────
     function showMsg(text,type){
       const el=document.getElementById("form-msg"); el.textContent=text;
       el.className=type==="error"?"msg-error":type==="waitlist"?"msg-waitlist":"msg-success-"+currentSport;
@@ -698,8 +1232,19 @@
 
     document.getElementById("glow").style.background="radial-gradient(circle,"+SPORTS.bad.glow+" 0%,transparent 70%)";
     initSW();
+    // Handle unsubscribe link
+    const urlParams = new URLSearchParams(window.location.search);
+    const unsubEmail = urlParams.get("unsub");
+    if (unsubEmail) {
+      api("unsubscribe", {email: unsubEmail}).then(data => {
+        if (data.success) alert("✓ Tu es désabonné·e des rappels pour " + unsubEmail);
+        else alert(data.error || "Email non trouvé.");
+      });
+    }
     setTerrains(nbTerrains);
     renderTabs(); loadPlayers(); prefetchAll(); loadChat(); updateNotifButton();
+    // Load bad-specific data on init
+    loadSubscribers();
 
     // ── Auto-refresh 15s ──────────────────────────────────────────────
     setInterval(async()=>{
