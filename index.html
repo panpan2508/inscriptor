@@ -928,19 +928,21 @@
     }
     async function prefetchAll() {
       const sport=currentSport, days=sessions[sport];
-      await Promise.all(days.map(async function(d) {
-        const key=dateKey(sport,d);
-        // Ne pas écraser la semaine en cours de chargement
-        if (key === dateKey(sport, sessions[sport][selectedIdx])) return;
+      const currentKey=dateKey(sport, sessions[sport][selectedIdx]);
+      // Charger les semaines une par une pour eviter les conflits
+      for (var i=0; i<days.length; i++) {
+        const key=dateKey(sport,days[i]);
+        if (key===currentKey) continue; // ne jamais toucher a la semaine courante
+        if (currentSport!==sport) return; // abort si sport change entre temps
         try {
           const data=await api("list",{week:key,sport});
-          if (currentSport===sport) {
+          if (currentSport===sport && key!==dateKey(sport,sessions[sport][selectedIdx])) {
             weekData[key]={players:(data.players||[]).map(safePlayer),waitlist:(data.waitlist||[]).map(safePlayer)};
             if (sport==="five") paymentLinks[key]=data.paymentLink||"";
+            renderTabs(); // update tabs au fur et a mesure
           }
-        } catch(e){ weekData[key]={players:[],waitlist:[]}; }
-      }));
-      if (currentSport===sport) renderTabs();
+        } catch(e){ /* ignorer les erreurs de prefetch */ }
+      }
     }
 
     // ── Render players ────────────────────────────────────────────────
@@ -1518,21 +1520,28 @@
       });
     }
     setTerrains(nbTerrains);
-    renderTabs(); loadPlayers(); prefetchAll(); loadChat(); updateNotifButton();
-    // Load bad-specific data on init
+    renderTabs();
+    loadChat();
+    updateNotifButton();
     loadSubscribers();
+    // Charger la semaine courante d'abord, puis les autres en arriere-plan
+    loadPlayers().then(function(){ prefetchAll(); });
 
     // ── Auto-refresh 15s ──────────────────────────────────────────────
     setInterval(async()=>{
       const sport=currentSport, badge=document.getElementById("live-badge");
       badge.classList.add("syncing");
       document.getElementById("live-text").textContent="SYNC · En cours...";
-      await Promise.all(sessions[sport].map(async d=>{
-        const key=dateKey(sport,d);
-        try{const data=await api("list",{week:key,sport});
-          if(currentSport===sport){weekData[key]={players:(data.players||[]).map(safePlayer),waitlist:(data.waitlist||[]).map(safePlayer)};if(sport==="five")paymentLinks[key]=data.paymentLink||"";}
+      for (var _i=0; _i<sessions[sport].length; _i++) {
+        const _d=sessions[sport][_i], _key=dateKey(sport,_d);
+        try{
+          const _data=await api("list",{week:_key,sport});
+          if(currentSport===sport){
+            weekData[_key]={players:(_data.players||[]).map(safePlayer),waitlist:(_data.waitlist||[]).map(safePlayer)};
+            if(sport==="five")paymentLinks[_key]=_data.paymentLink||"";
+          }
         }catch(e){}
-      }));
+      }
       try{const data=await api("chatList",{week:chatWeekKey(sport)});if(data.messages)renderChat(data.messages);}catch(e){}
       if(currentSport===sport){
         renderTabs();
