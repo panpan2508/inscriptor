@@ -329,6 +329,23 @@
     .pitch-player.has-player .pitch-player-name { display: block; }
 
     .compo-save-msg { font-size: 12px; color: #00e676; font-family:'Space Mono',monospace; margin-top: 8px; }
+
+    /* ── Skeletons ── */
+    @keyframes shimmer {
+      0%   { background-position: -600px 0; }
+      100% { background-position:  600px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255,255,255,.06) 25%, rgba(255,255,255,.12) 50%, rgba(255,255,255,.06) 75%);
+      background-size: 600px 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 8px;
+    }
+    .skeleton-player { height: 46px; border-radius: 11px; margin-bottom: 7px; }
+    .skeleton-tab    { height: 72px; border-radius: 14px; min-width: 120px; flex: 0 0 auto; }
+    .skeleton-counter-num { height: 52px; width: 80px; border-radius: 8px; display:inline-block; }
+    .skeleton-bar    { height: 7px; border-radius: 4px; width:100%; margin-top:8px; }
+    .skeleton-chat   { height: 44px; border-radius: 10px; margin-bottom: 8px; }
     @keyframes bounce { from { transform: translateY(0) scale(1); } to { transform: translateY(-20px) scale(1.1); } }
     @keyframes fadeIn    { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
     @keyframes spin      { to { transform:rotate(360deg); } }
@@ -434,14 +451,14 @@
 
     <!-- Week tabs -->
     <p class="planning-label" id="planning-label">Choisir une soirée</p>
-    <div class="weeks-scroll" id="weeks-scroll"></div>
+    <div class="weeks-scroll" id="weeks-scroll"><div class="skeleton skeleton-tab"></div><div class="skeleton skeleton-tab"></div><div class="skeleton skeleton-tab"></div><div class="skeleton skeleton-tab"></div></div>
 
     <!-- Counter -->
     <div class="card">
       <div class="counter-row">
         <div>
           <div class="counter-number" id="counter-display">
-            <span id="count">0</span><span class="total" id="count-total">/12</span>
+            <span id="count" class="skeleton skeleton-counter-num">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="total" id="count-total"></span>
           </div>
           <div class="counter-label" id="spots-label">Chargement...</div>
         </div>
@@ -474,12 +491,12 @@
 
     <div class="card">
       <div class="card-title" id="list-title">Inscrits (0)</div>
-      <div id="player-list"><div class="spinner bad"></div></div>
+      <div id="player-list"><div class="skeleton skeleton-player"></div><div class="skeleton skeleton-player"></div><div class="skeleton skeleton-player"></div></div>
     </div>
 
     <div class="card">
       <div class="card-title">💬 Chat du groupe</div>
-      <div class="chat-messages" id="chat-messages"><div class="spinner bad"></div></div>
+      <div class="chat-messages" id="chat-messages"><div class="skeleton skeleton-chat"></div><div class="skeleton skeleton-chat"></div><div class="skeleton skeleton-chat"></div></div>
       <div class="chat-form">
         <input type="text" id="chat-name" class="chat-name-input input-bad" placeholder="Pseudo" maxlength="20" />
         <input type="text" id="chat-msg" class="input-bad" placeholder="Ton message..." maxlength="200" />
@@ -506,6 +523,28 @@
         <div class="subscribe-list" id="sub-list" style="display:none">
           <div class="subscribe-list-title">Abonnés (<span id="sub-count">0</span>)</div>
           <div id="sub-list-items"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Abonnés rappel Five -->
+    <div id="subscribe-five-section" style="display:none">
+      <div class="subscribe-card" style="background:rgba(227,6,19,.06);border-color:rgba(227,6,19,.2);">
+        <div class="subscribe-header">
+          <div class="subscribe-title" style="color:#e30613;">📬 Rappels hebdo Five</div>
+        </div>
+        <div class="subscribe-sub">Reçois un mail chaque lundi à 9h pour t'inscrire à la séance du mardi.</div>
+        <div class="subscribe-form">
+          <div class="subscribe-row">
+            <input type="text"  id="sub-five-name"  class="input-five" placeholder="Prénom Nom" style="font-size:13px;padding:10px 14px;" />
+            <input type="email" id="sub-five-email" class="input-five" placeholder="Email" style="font-size:13px;padding:10px 14px;" />
+          </div>
+          <button class="btn-primary btn-five" onclick="subscribeFive()" style="padding:10px 18px;font-size:13px;align-self:flex-start;">S'abonner</button>
+          <p id="sub-five-msg" style="font-size:12px;margin-top:4px;"></p>
+        </div>
+        <div class="subscribe-list" id="sub-five-list" style="display:none">
+          <div class="subscribe-list-title">Abonnés (<span id="sub-five-count">0</span>)</div>
+          <div id="sub-five-list-items"></div>
         </div>
       </div>
     </div>
@@ -630,7 +669,7 @@
 
   <script>
     // ── Config ────────────────────────────────────────────────────────
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMgRLLI821yUdayx2Vf03DdmVxzSCZjhx1yTIjukd3TJfam5InCKugR6cN0Ni2o0sxZw/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCwqeupjIsgXi1G3YA4bRP7ocoxAUx4UdA_SMXBIo_5zvW8zV-xQ6LhTU5r9M4uv9vlw/exec";
 
     const SPORTS = {
       bad: {
@@ -848,13 +887,19 @@
     }
     async function loadPlayers() {
       const sport=currentSport, key=dateKey(sport,sessions[sport][selectedIdx]);
-      document.getElementById("player-list").innerHTML='<div class="spinner '+sport+'"></div>';
+      // Show skeletons while loading
+      document.getElementById("player-list").innerHTML = skelPlayers(4);
+      document.getElementById("weeks-scroll").innerHTML = skelTabs(4);
+      showCounterSkeleton();
       try {
         const data=await api("list",{week:key,sport});
         weekData[key]={players:(data.players||[]).map(safePlayer),waitlist:(data.waitlist||[]).map(safePlayer)};
         if (sport==="five") { paymentLinks[key]=data.paymentLink||""; renderPaymentLink(key); }
         renderTabs(); renderPlayers(weekData[key]);
-      } catch(e) { document.getElementById("player-list").innerHTML='<p style="color:#ff5252;font-size:13px">Erreur de connexion.</p>'; }
+      } catch(e) {
+        document.getElementById("player-list").innerHTML='<p style="color:#ff5252;font-size:13px">Erreur de connexion.</p>';
+        renderTabs();
+      }
     }
     async function prefetchAll() {
       const sport=currentSport, days=sessions[sport];
@@ -878,8 +923,7 @@
       const players=wd.players||[], waitlist=wd.waitlist||[];
       const count=players.length, isFull=count>=max, pct=Math.min((count/max)*100,100);
 
-      document.getElementById("count").textContent=count;
-      document.getElementById("count-total").textContent="/"+max;
+      hideCounterSkeleton(count, max);
       document.getElementById("tick-mid").textContent=Math.floor(max/2);
       document.getElementById("tick-max").textContent=max;
       document.getElementById("list-title").textContent="Inscrits ("+count+")";
@@ -969,7 +1013,7 @@
     // ── Chat ──────────────────────────────────────────────────────────
     async function loadChat(){
       const sport=currentSport;
-      document.getElementById("chat-messages").innerHTML='<div class="spinner '+sport+'"></div>';
+      document.getElementById("chat-messages").innerHTML=skelChat(3);
       try{const data=await api("chatList",{week:chatWeekKey(sport)});renderChat(data.messages||[]);}
       catch(e){document.getElementById("chat-messages").innerHTML='<p class="chat-empty">Erreur de connexion.</p>';}
     }
@@ -1266,6 +1310,7 @@
           msg.textContent="✓ Abonné·e ! Tu recevras un rappel chaque lundi.";msg.style.color="#00e676";
           document.getElementById("sub-name").value="";document.getElementById("sub-email").value="";
           loadSubscribers();
+    // Five subscribers loaded on switch
         }else{msg.textContent=data.error||"Erreur.";msg.style.color="#ff5252";}
       }catch(e){msg.textContent="Erreur de connexion.";msg.style.color="#ff5252";}
     }
@@ -1346,6 +1391,75 @@
         }
       }catch(e){alert("Erreur de connexion.");}
       btn.disabled=false;
+    }
+
+
+    // ── Abonnés Five ───────────────────────────────────────────────────────────
+    async function subscribeFive() {
+      const name  = document.getElementById("sub-five-name").value.trim();
+      const email = document.getElementById("sub-five-email").value.trim();
+      const msg   = document.getElementById("sub-five-msg");
+      if (!name || !email) { msg.textContent = "Remplis les deux champs."; msg.style.color = "#ff5252"; return; }
+      try {
+        const data = await api("subscribe", {name, email, sport:"five"});
+        if (data.success) {
+          msg.textContent = "✓ Abonné·e ! Tu recevras un rappel chaque lundi.";
+          msg.style.color = "#e30613";
+          document.getElementById("sub-five-name").value = "";
+          document.getElementById("sub-five-email").value = "";
+          loadSubscribersFive();
+        } else { msg.textContent = data.error || "Erreur."; msg.style.color = "#ff5252"; }
+      } catch(e) { msg.textContent = "Erreur de connexion."; msg.style.color = "#ff5252"; }
+    }
+
+    async function unsubscribeFive(email) {
+      if (!confirm("Se désabonner des rappels Five pour " + email + " ?")) return;
+      try {
+        const data = await api("unsubscribe", {email, sport:"five"});
+        if (data.success) loadSubscribersFive();
+      } catch(e) {}
+    }
+
+    async function loadSubscribersFive() {
+      try {
+        const data = await api("getSubscribers", {sport:"five"});
+        const subs = data.subscribers || [];
+        document.getElementById("sub-five-count").textContent = subs.length;
+        const listEl = document.getElementById("sub-five-list-items");
+        if (!subs.length) {
+          listEl.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,.25);font-style:italic;">Aucun abonné pour l’instant.</div>';
+        } else {
+          listEl.innerHTML = subs.map(function(s) {
+            return '<div class="subscriber-row"><span>' + escHtml(s.name) + ' <span style="color:rgba(255,255,255,.3);font-size:11px;">' + escHtml(s.email) + '</span></span><button class="btn-unsub" onclick="unsubscribeFive(&quot;' + escAttr(s.email) + '&quot;)">&#x2715;</button></div>';
+          }).join("");
+          document.getElementById("sub-five-list").style.display = "block";
+        }
+        if (subs.length > 0) document.getElementById("sub-five-list").style.display = "block";
+      } catch(e) {}
+    }
+
+    // ── Skeleton helpers ───────────────────────────────────────────────────────
+    function skelPlayers(n) {
+      return Array(n).fill('<div class="skeleton skeleton-player"></div>').join("");
+    }
+    function skelTabs(n) {
+      return Array(n).fill('<div class="skeleton skeleton-tab"></div>').join("");
+    }
+    function skelChat(n) {
+      return Array(n).fill('<div class="skeleton skeleton-chat"></div>').join("");
+    }
+    function showCounterSkeleton() {
+      document.getElementById("count").className = "skeleton skeleton-counter-num";
+      document.getElementById("count").textContent = "    ";
+      document.getElementById("count-total").textContent = "";
+      document.getElementById("progress-fill").style.width = "0%";
+      document.getElementById("spots-label").textContent = "";
+    }
+    function hideCounterSkeleton(count, max) {
+      const el = document.getElementById("count");
+      el.className = "";
+      el.textContent = count;
+      document.getElementById("count-total").textContent = "/" + max;
     }
 
 // ── Utils ─────────────────────────────────────────────────────────
