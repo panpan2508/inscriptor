@@ -1,8 +1,8 @@
 // Service Worker — Inscriptor PWA
 // Gère le cache ET les notifications push locales via sync périodique
 
-const CACHE        = "inscriptor-v3";
-const APPS_SCRIPT  = "https://script.google.com/macros/s/AKfycbzAN85HlVDl1P7MBWIXVdoaEHKP4HU3cxIM8NFO61ijiiDPyyWtvmfMSCGVrE7p_utJUQ/exec";
+const CACHE        = "inscriptor-v4";
+const APPS_SCRIPT  = "https://script.google.com/macros/s/AKfycbwCwqeupjIsgXi1G3YA4bRP7ocoxAUx4UdA_SMXBIo_5zvW8zV-xQ6LhTU5r9M4uv9vlw/exec";
 const ASSETS = ["/inscriptor/", "/inscriptor/index.html", "/inscriptor/manifest.json"];
 const CHECK_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 
