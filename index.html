@@ -870,10 +870,11 @@
           +cnt_h+'<div class="wt-num">'+dayNum+'</div><div class="wt-month">'+month+'</div>'+badge+'</div>';
       }).join("");
     }
-    function selectWeek(idx) {
-      selectedIdx=idx; renderTabs(); loadPlayers();
+    function selectWeek(newIdx) {
+      if (newIdx === selectedIdx) return;
+      selectedIdx=newIdx; renderTabs(); loadPlayers();
       if (currentSport==="five") {
-        renderPaymentLink(dateKey("five",sessions.five[idx]));
+        renderPaymentLink(dateKey("five",sessions.five[newIdx]));
         loadCancelStatus();
         loadCompo();
       }
@@ -885,33 +886,50 @@
       if (typeof p==="string"){const m=p.match(/^(.*?)<([^>]+)>$/);return m?{name:m[1].trim(),email:m[2].trim()}:{name:p.trim(),email:""};}
       return {name:p.name||"",email:p.email||""};
     }
+    let _loadPlayersId = 0; // request ID pour annuler les requêtes obsolètes
+
     async function loadPlayers() {
-      const sport=currentSport, key=dateKey(sport,sessions[sport][selectedIdx]);
-      // Show skeletons while loading
+      const sport=currentSport, idx=selectedIdx;
+      const key=dateKey(sport,sessions[sport][idx]);
+      const reqId = ++_loadPlayersId; // chaque appel a un ID unique
+
+      // Afficher skeletons immédiatement
       document.getElementById("player-list").innerHTML = skelPlayers(4);
-      document.getElementById("weeks-scroll").innerHTML = skelTabs(4);
       showCounterSkeleton();
+      // Tabs : afficher le cache si dispo, sinon skeleton
+      if (Object.keys(weekData).some(function(k){return k.startsWith(SPORTS[sport].prefix);})) {
+        renderTabs();
+      } else {
+        document.getElementById("weeks-scroll").innerHTML = skelTabs(4);
+      }
+
       try {
-        const data=await api("list",{week:key,sport});
-        weekData[key]={players:(data.players||[]).map(safePlayer),waitlist:(data.waitlist||[]).map(safePlayer)};
+        const data = await api("list", {week:key, sport});
+        // Ignorer si une requête plus récente a été lancée
+        if (reqId !== _loadPlayersId) return;
+        weekData[key] = {players:(data.players||[]).map(safePlayer), waitlist:(data.waitlist||[]).map(safePlayer)};
         if (sport==="five") { paymentLinks[key]=data.paymentLink||""; renderPaymentLink(key); }
-        renderTabs(); renderPlayers(weekData[key]);
+        renderTabs();
+        renderPlayers(weekData[key]);
       } catch(e) {
+        if (reqId !== _loadPlayersId) return;
         document.getElementById("player-list").innerHTML='<p style="color:#ff5252;font-size:13px">Erreur de connexion.</p>';
         renderTabs();
       }
     }
     async function prefetchAll() {
       const sport=currentSport, days=sessions[sport];
-      await Promise.all(days.map(async d=>{
+      await Promise.all(days.map(async function(d) {
         const key=dateKey(sport,d);
+        // Ne pas écraser la semaine en cours de chargement
+        if (key === dateKey(sport, sessions[sport][selectedIdx])) return;
         try {
           const data=await api("list",{week:key,sport});
           if (currentSport===sport) {
             weekData[key]={players:(data.players||[]).map(safePlayer),waitlist:(data.waitlist||[]).map(safePlayer)};
             if (sport==="five") paymentLinks[key]=data.paymentLink||"";
           }
-        } catch(e){weekData[key]={players:[],waitlist:[]};}
+        } catch(e){ weekData[key]={players:[],waitlist:[]}; }
       }));
       if (currentSport===sport) renderTabs();
     }
