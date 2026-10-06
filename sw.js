@@ -2,7 +2,7 @@
 // Gère le cache ET les notifications push locales via sync périodique
 
 const CACHE        = "inscriptor-v4";
-const APPS_SCRIPT  = "https://script.google.com/macros/s/AKfycbzW_H8OybtKv2ooWCzbsDYYbqhYHwirOzox0DDMoMUpp86oGea0p-sKJvnx8sXagLVBgw/exec";
+const APPS_SCRIPT  = "https://script.google.com/macros/s/AKfycbzUGnaPP61naXsxyKQ3KL87kchfH5uhjYpbczmkuzSvRy_SidEUm0L0Tnz1zBQZhk88VQ/exec";
 const ASSETS = ["/inscriptor/", "/inscriptor/index.html", "/inscriptor/manifest.json"];
 const CHECK_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 
