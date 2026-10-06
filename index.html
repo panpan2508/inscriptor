@@ -458,7 +458,7 @@
       <div class="counter-row">
         <div>
           <div class="counter-number" id="counter-display">
-            <span id="count" class="skeleton skeleton-counter-num">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="total" id="count-total"></span>
+            <span id="count">0</span><span class="total" id="count-total">/12</span>
           </div>
           <div class="counter-label" id="spots-label">Chargement...</div>
         </div>
@@ -822,11 +822,20 @@
       renderTabs(); loadPlayers(); prefetchAll(); loadChat();
       updateNotifButton();
       // Show/hide sport-specific sections
-      document.getElementById("subscribe-section").style.display = sport==="bad"  ? "block" : "none";
-      document.getElementById("cancel-section").style.display    = sport==="five" ? "block" : "none";
-      document.getElementById("compo-section").style.display     = sport==="five" ? "block" : "none";
+      document.getElementById("subscribe-section").style.display      = sport==="bad"  ? "block" : "none";
+      document.getElementById("subscribe-five-section").style.display = sport==="five" ? "block" : "none";
+      document.getElementById("cancel-section").style.display         = sport==="five" ? "block" : "none";
+      document.getElementById("compo-section").style.display          = sport==="five" ? "block" : "none";
       if (sport==="bad")  { loadSubscribers(); }
-      if (sport==="five") { loadCancelStatus(); loadCompo(); }
+      if (sport==="five") { loadCancelStatus(); loadCompo(); loadSubscribersFive(); }
+      // Vider données de l'autre sport + reset UI
+      const otherPrefix = sport==="bad" ? "five" : "badminton";
+      Object.keys(weekData).forEach(function(k){ if(k.indexOf(otherPrefix)===0) delete weekData[k]; });
+      document.getElementById("form-title").textContent = "S'inscrire";
+      document.getElementById("form-msg").textContent = "";
+      lbOpen=false; lbBuilt=false;
+      document.getElementById("lb-content").classList.remove("open");
+      document.getElementById("lb-toggle").textContent="▼ Voir";
     }
 
     // ── Dates ─────────────────────────────────────────────────────────
